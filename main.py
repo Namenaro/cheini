@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 import easygui
 import copy
 import cv2
@@ -10,7 +11,9 @@ print (events)
 
 HSIDE = 2
 
-path = easygui.fileopenbox()
+path = easygui.fileopenbox(msg='выбрать картинку', filetypes=[["*.png", "*.jpg","*.jpeg", 'картинки']])
+if path is None:
+    exit()
 print("selected" + path)
 name = utils.ask_user_for_name()
 img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)  # not draw on it!!!
@@ -52,8 +55,10 @@ cv2.destroyAllWindows()
 
 # сохранение результатов:
 utils.setup_folder_for_results(name)
-utils.save_object(coordinateStore1, 'points and imgs')
+utils.save_object(coordinateStore1.points, 'points')
+utils.save_object(coordinateStore1.foveas, 'foveas')
 for i in range(len(coordinateStore1.points)):
     utils.save_img_scaled(str(i),coordinateStore1.foveas[i], scaling_factor=5)
-restored = utils.open_file('points and imgs')
-print("points: " + str(restored.points))
+restored_points = utils.open_file('points.pkl')
+print("points: " + str(restored_points))
+

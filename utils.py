@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 from easygui import multenterbox
 import _pickle as pickle
 import cv2
@@ -31,7 +32,7 @@ def save_object(obj, filename):
 
 def open_file(filename):
     obj = None
-    with open(filename + ".pkl", 'rb') as input:
+    with open(filename , 'rb') as input:
         obj = pickle.load(input)
     return obj
 
@@ -49,6 +50,13 @@ def setup_folder_for_results(main_folder='results'):
         for f in files:
             os.remove(f)
     os.chdir(main_folder)
+
+def scale_dataset_to01(dataset):
+    result = []
+    for tensor in dataset:
+        tensor01 = tensor/255.0
+        result.append(tensor01)
+    return result
 
 def resize_img(img, scaling_factor ):
     matrix1 = cv2.resize(img, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_NEAREST)
