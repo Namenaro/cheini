@@ -29,4 +29,6 @@ def create_ae_MASHA(encoding_dim, input_data_shape):
     return encoder, decoder, autoencoder
 
 if __name__ == '__main__':
-    pass
+    from keras.utils import plot_model
+
+    plot_model(model, to_file='model.png', show_shapes=True)

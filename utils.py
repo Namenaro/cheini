@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*
 from easygui import multenterbox
 import _pickle as pickle
+import matplotlib.pyplot as plt
 import os
 import glob
 import easygui
@@ -82,6 +83,7 @@ def get_dataset(READ_DAMMY):
 
     # norm [0, 255] to [0, 1]
     foveas01 = scale_dataset_to01(foveas255)
+    draw_mat(foveas01[0])
     foveas01 = np.array(foveas01)
     print ('input data shape: ' + str(foveas01.shape))
     return foveas01, points
@@ -89,3 +91,14 @@ def get_dataset(READ_DAMMY):
 def resize_img(img, scaling_factor ):
     matrix1 = cv2.resize(img, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_NEAREST)
     cv2.imshow("INTER_NEAREST", matrix1)
+
+
+def draw_mat(matrix):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    mmin = matrix.min()
+    mmax = matrix.max()
+    abs_max = max(abs(mmax), abs(mmin))
+    cax = ax.matshow(matrix, vmin=-abs_max, vmax=abs_max)
+    fig.colorbar(cax)
+    plt.show()

@@ -19,12 +19,13 @@ foveas01, points = utils.get_dataset(READ_DAMMY=True)
 # create
 print("create model...")
 encoder, decoder, autoencoder = simple_nets.create_ae_MASHA(encoding_dim=5, input_data_shape=foveas01[0].shape)
-
+from keras.utils import plot_model
+plot_model(autoencoder, to_file='model.png', show_shapes=True)
 # fit
 print("fit model to data..")
 autoencoder.compile(optimizer='sgd', loss='mean_squared_error')
 autoencoder.fit(foveas01, foveas01,
-                epochs=1400,
+                epochs=400,
                 batch_size=ceil(len(foveas01)/2),
                 shuffle=True,
                 validation_data=(foveas01, foveas01))
@@ -44,6 +45,6 @@ autoencoder.fit(foveas01, foveas01,
 ########################## save summary ##########################################
 ##################################################################################
 
-# start dialog what to save
+# start dialog what to save - при каких гиепрпараметрах рез-т был получен?
 
 
