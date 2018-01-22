@@ -4,7 +4,7 @@ from keras.models import Model
 import numpy as np
 
 
-def create_dense_ae(encoding_dim, input_data_shape):
+def create_ae_MASHA(encoding_dim, input_data_shape):
     # Энкодер
     # Входной плейсхолдер
     input_img = Input(shape=input_data_shape)  # 28, 28, 1 - размерности строк, столбцов, фильтров одной картинки, без батч-размерности
@@ -28,5 +28,5 @@ def create_dense_ae(encoding_dim, input_data_shape):
     autoencoder = Model(input_img, decoder(encoder(input_img)), name="autoencoder")
     return encoder, decoder, autoencoder
 
-encoder, decoder, autoencoder = create_dense_ae()
-autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+if __name__ == '__main__':
+    pass

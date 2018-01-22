@@ -3,34 +3,31 @@ print ("MAIN_FIT")
 ############################ STAGE 1 #############################################
 ###################### Prerocess data ############################################
 ##################################################################################
-import easygui
 import utils
-import cv2
-import numpy as np
+import simple_nets
+from math import floor, ceil
 
-# load from pkl
-points_pkl = easygui.fileopenbox(msg='выбрать файл points.pkl (коордитаы фиксаций)', filetypes=["*.pkl"])
-if points_pkl is None:
-    exit()
-points = utils.open_file(points_pkl)
+# вытаскиваем датасет из файла
+foveas01, points = utils.get_dataset(READ_DAMMY=True)
 
-foveas255_pkl = easygui.fileopenbox(msg='выбрать файл foveas.pkl', filetypes=["*.pkl"])
-if foveas255_pkl is None:
-    exit()
-foveas255 = utils.open_file(foveas255_pkl)
-
-# norm [0, 255] to [0, 1]
-foveas01 = utils.scale_dataset_to01(foveas255)
-foveas01 = np.array(foveas01)
-print ('input data shape: ' + str(foveas01.shape))
+# мб стоит вычесть среднее или усилить констраст как латеральное торможение?
 
 ############################ STAGE 2 #############################################
 ########################## Create net ############################################
 ##################################################################################
 
-
 # create
+print("create model...")
+encoder, decoder, autoencoder = simple_nets.create_ae_MASHA(encoding_dim=5, input_data_shape=foveas01[0].shape)
+
 # fit
+print("fit model to data..")
+autoencoder.compile(optimizer='sgd', loss='mean_squared_error')
+autoencoder.fit(foveas01, foveas01,
+                epochs=1400,
+                batch_size=ceil(len(foveas01)/2),
+                shuffle=True,
+                validation_data=(foveas01, foveas01))
 
 ############################ STAGE 3 #############################################
 ########################## evaluate res ##########################################

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*
 from easygui import multenterbox
 import _pickle as pickle
-import cv2
 import os
 import glob
+import easygui
+import cv2
+import numpy as np
 
 def ask_user_for_name():
     msg = "Enter name for folder"
@@ -57,6 +59,32 @@ def scale_dataset_to01(dataset):
         tensor01 = tensor/255.0
         result.append(tensor01)
     return result
+
+# load from pkl
+def get_dataset(READ_DAMMY):
+    points_pkl = None
+    foveas255_pkl = None
+    if READ_DAMMY:
+        points_pkl = 'dammy//points.pkl'
+        foveas255_pkl = 'dammy//foveas.pkl'
+        print("opened DAMMY pkl file!!!!!")
+    else:
+        points_pkl = easygui.fileopenbox(msg='выбрать файл points.pkl (коордитаы фиксаций)', filetypes=["*.pkl"])
+        if points_pkl is None:
+            exit()
+        foveas255_pkl = easygui.fileopenbox(msg='выбрать файл foveas.pkl', filetypes=["*.pkl"])
+        if foveas255_pkl is None:
+            exit()
+        print("opened file with foveas: " + foveas255_pkl)
+
+    points = open_file(points_pkl)
+    foveas255 = open_file(foveas255_pkl)
+
+    # norm [0, 255] to [0, 1]
+    foveas01 = scale_dataset_to01(foveas255)
+    foveas01 = np.array(foveas01)
+    print ('input data shape: ' + str(foveas01.shape))
+    return foveas01, points
 
 def resize_img(img, scaling_factor ):
     matrix1 = cv2.resize(img, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_NEAREST)
