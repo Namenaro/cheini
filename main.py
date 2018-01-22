@@ -3,10 +3,12 @@ import copy
 import cv2
 import numpy as np
 import utils
+
+
 events = [i for i in dir(cv2) if 'EVENT' in i]
 print (events)
 
-HSIDE = 1
+HSIDE = 2
 
 path = easygui.fileopenbox()
 print("selected" + path)
@@ -48,7 +50,10 @@ while(1):
         break
 cv2.destroyAllWindows()
 
-
-print("Selected Coordinates: ")
-for i in coordinateStore1.points:
-    print (i)
+# сохранение результатов:
+utils.setup_folder_for_results(name)
+utils.save_object(coordinateStore1, 'points and imgs')
+for i in range(len(coordinateStore1.points)):
+    utils.save_img_scaled(str(i),coordinateStore1.foveas[i], scaling_factor=5)
+restored = utils.open_file('points and imgs')
+print("points: " + str(restored.points))
