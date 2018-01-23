@@ -18,7 +18,7 @@ def create_ae_MASHA(encoding_dim, input_data_shape):
     input_encoded = Input(shape=(encoding_dim,))
     flatten_data_len = np.prod(input_data_shape[:])
     print ("flatten shape = " + str(flatten_data_len))
-    flat_decoded = Dense(flatten_data_len, activation='sigmoid')(input_encoded)
+    flat_decoded = Dense(flatten_data_len, activation='sigmoid', name='MASHA')(input_encoded)
     decoded = Reshape(input_data_shape)(flat_decoded)
 
     encoder = Model(input_img, encoded, name="encoder")
@@ -26,7 +26,3 @@ def create_ae_MASHA(encoding_dim, input_data_shape):
     autoencoder = Model(input_img, decoder(encoder(input_img)), name="autoencoder")
     return encoder, decoder, autoencoder
 
-if __name__ == '__main__':
-    from keras.utils import plot_model
-
-    plot_model(model, to_file='model.png', show_shapes=True)

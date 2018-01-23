@@ -34,7 +34,7 @@ autoencoder.compile(optimizer='sgd', loss='mean_squared_error')
 
 early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
 history =  autoencoder.fit(foveas01, foveas01,
-                epochs=100,
+                epochs=200,
                 batch_size=ceil(len(foveas01)/2),
                 shuffle=True,
                 validation_data=(foveas01, foveas01),
@@ -121,7 +121,24 @@ def visualise_points_manifold(imgs, i=0, j=1):
 visualise_points_manifold(foveas01, 0, 1)
 
 # 6. Визуализация весов как картинки
+def visualise_weights_and_biases(model, name_of_layer):
+    w = model.get_layer(name_of_layer).get_weights()
+    weights = w[0]
+    biases = w[1]
+    print ("w_shape=" + str(weights.shape) + ", b_shape=" + str(biases.shape))
 
+    wmin = weights.min()
+    wmax = weights.max()
+    bmin = biases.min()
+    bmax = biases.max()
+    abs_max = max(abs(bmax), abs(bmin), abs(wmax), abs(wmin))
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+    cax = ax1.matshow(weights, vmin=-abs_max, vmax=abs_max, cmap='bwr')
+    cax = ax2.matshow([biases], vmin=-abs_max, vmax=abs_max, cmap='bwr')
+    fig.colorbar(cax)
+    plt.show()
+
+visualise_weights_and_biases(decoder, "MASHA")
 
 # 7. График действия ( н-1 точек, значение точки = сумма измененией (по модулю) попиксельно между соседними фреймами
 
@@ -161,6 +178,9 @@ x_train_noisy = add_noise(foveas01, noise_factor=0.01, visualise=True)
 # 11. сохраение весов и сети
 # 12. energy (entropy) per frame
 
+# 13. Средний модуль веса и биаса в обученной сети
+# 14. Гистограмма весов и биасов
+# 15. Гисторамма активаций
 
 ############################ STAGE 4 #############################################
 ########################## save summary ##########################################
