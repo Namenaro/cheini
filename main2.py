@@ -34,7 +34,7 @@ autoencoder.compile(optimizer='sgd', loss='mean_squared_error')
 
 early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
 history =  autoencoder.fit(foveas01, foveas01,
-                epochs=10000,
+                epochs=100,
                 batch_size=ceil(len(foveas01)/2),
                 shuffle=True,
                 validation_data=(foveas01, foveas01),
@@ -104,7 +104,6 @@ def visualise_points_manifold(imgs, i=0, j=1):
     grid_x = np.linspace(2*min(encoded_imgs[:, i]), 2*max(encoded_imgs[:, i]), grid_n)
     grid_y = np.linspace(2*min(encoded_imgs[:, j]), 2*max(encoded_imgs[:, j]), grid_n)
 
-
     for ix, xi in enumerate(grid_x):
         for iy, yi in enumerate(grid_y):
             code = encoded_imgs[0]
@@ -126,8 +125,41 @@ visualise_points_manifold(foveas01, 0, 1)
 
 # 7. График действия ( н-1 точек, значение точки = сумма измененией (по модулю) попиксельно между соседними фреймами
 
+# 8. визуализировать скрытую репрезентацию
+plt.imshow(encoded_imgs, cmap='gray') # там много интересных параметров в этой ф-ции, читать доки!
 
-# energy (entropy) per frame
+# 9. Тест шумом
+def add_noise(dataset, noise_factor, visualise=True):
+    x_train_noisy = dataset + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=dataset.shape)
+    x_train_noisy = np.clip(x_train_noisy, 0., 1.)
+    n_len = len(dataset)
+    if visualise:
+        plt.figure(figsize=(10, 2))
+        for i in range(n_len):
+            # display original
+            ax = plt.subplot(2, n, i + 1)
+            ax.set_title("before " + str(i))
+            plt.imshow(dataset[i])
+            plt.gray()
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+            # display with noise
+            ax = plt.subplot(2, n, i + 1 + n)
+            plt.imshow(x_train_noisy[i])
+            plt.gray()
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        plt.show()
+    return x_train_noisy
+
+x_train_noisy = add_noise(foveas01, noise_factor=0.01, visualise=True)
+
+# 10. Энергия скрытого многообразия
+
+
+# 11. сохраение весов и сети
+# 12. energy (entropy) per frame
 
 
 ############################ STAGE 4 #############################################
