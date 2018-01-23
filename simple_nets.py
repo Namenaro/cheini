@@ -21,8 +21,6 @@ def create_ae_MASHA(encoding_dim, input_data_shape):
     flat_decoded = Dense(flatten_data_len, activation='sigmoid')(input_encoded)
     decoded = Reshape(input_data_shape)(flat_decoded)
 
-    # Модели, в конструктор первым аргументом передаются входные слои, а вторым выходные слои
-    # Другие модели можно так же использовать как и слои
     encoder = Model(input_img, encoded, name="encoder")
     decoder = Model(input_encoded, decoded, name="decoder")
     autoencoder = Model(input_img, decoder(encoder(input_img)), name="autoencoder")

@@ -83,7 +83,6 @@ def get_dataset(READ_DAMMY):
 
     # norm [0, 255] to [0, 1]
     foveas01 = scale_dataset_to01(foveas255)
-    draw_mat(foveas01[0])
     foveas01 = np.array(foveas01)
     print ('input data shape: ' + str(foveas01.shape))
     return foveas01, points
