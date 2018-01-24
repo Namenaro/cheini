@@ -15,6 +15,7 @@ from keras.callbacks import TensorBoard
 ##################################################################################
 # вытаскиваем датасет из файла
 foveas01, points = utils.get_dataset(READ_DAMMY=True)
+NAME = "YANA"
 
 # мб стоит вычесть среднее или усилить констраст как латеральное торможение?
 
@@ -25,7 +26,11 @@ foveas01, points = utils.get_dataset(READ_DAMMY=True)
 # create
 print("create model...")
 encoding_dim = 3
-encoder, decoder, autoencoder = simple_nets.create_ae_MASHA(encoding_dim=3, input_data_shape=foveas01[0].shape)
+encoder, decoder, autoencoder = simple_nets.create_ae_YANA(encoding_dim=3,
+                                                           input_data_shape=foveas01[0].shape,
+                                                           a_koef_reg=0.001,
+                                                           koef_reg=0.001,
+                                                           activation_on_code='sigmoid')
 
 # fit
 print("fit model to data..")
@@ -34,7 +39,7 @@ autoencoder.compile(optimizer='sgd', loss='mean_squared_error')
 
 early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
 history =  autoencoder.fit(foveas01, foveas01,
-                epochs=200,
+                epochs=3000,
                 batch_size=ceil(len(foveas01)/2),
                 shuffle=True,
                 validation_data=(foveas01, foveas01),
@@ -138,7 +143,7 @@ def visualise_weights_and_biases(model, name_of_layer):
     fig.colorbar(cax)
     plt.show()
 
-visualise_weights_and_biases(decoder, "MASHA")
+visualise_weights_and_biases(decoder, NAME)
 
 # 7. График действия ( н-1 точек, значение точки = сумма измененией (по модулю) попиксельно между соседними фреймами
 def energy_of_pic_sequence(pic_sequence):
@@ -216,7 +221,7 @@ def get_abs_avg_wbiases(model, name_of_layer):
     mb = (np.absolute(biases)).mean()
     print("mean(w)=" + str(mw) + ", mean(b)=" + str(mb))
 
-get_abs_avg_wbiases(decoder, "MASHA")
+get_abs_avg_wbiases(decoder, NAME)
 
 
 
