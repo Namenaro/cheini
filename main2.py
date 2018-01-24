@@ -179,6 +179,16 @@ x_train_noisy = add_noise(foveas01, noise_factor=0.01, visualise=True)
 # 12. energy (entropy) per frame
 
 # 13. Средний модуль веса и биаса в обученной сети
+def get_abs_avg_wbiases(model, name_of_layer):
+    w = model.get_layer(name_of_layer).get_weights()
+    weights = w[0]
+    biases = w[1]
+    mw = (np.absolute(weights)).mean()
+    mb = (np.absolute(biases)).mean()
+    print ("mean(w)=" + str(mw) + ", mean(b)=" + str(mb))
+
+get_abs_avg_wbiases(decoder, "MASHA")
+
 # 14. Гистограмма весов и биасов
 # 15. Гисторамма активаций
 
