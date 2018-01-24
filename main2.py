@@ -15,7 +15,7 @@ from keras.callbacks import TensorBoard
 ##################################################################################
 # вытаскиваем датасет из файла
 foveas01, points = utils.get_dataset(READ_DAMMY=True)
-NAME = "YANA"
+NAME = "ZINA"
 
 # мб стоит вычесть среднее или усилить констраст как латеральное торможение?
 
@@ -26,11 +26,13 @@ NAME = "YANA"
 # create
 print("create model...")
 encoding_dim = 3
-encoder, decoder, autoencoder = simple_nets.create_ae_YANA(encoding_dim=3,
+encoder, decoder, autoencoder = simple_nets.create_ae_ZINA(encoding_dim=4,
                                                            input_data_shape=foveas01[0].shape,
-                                                           a_koef_reg=0.001,
-                                                           koef_reg=0.001,
-                                                           activation_on_code='sigmoid')
+                                                           a_koef_reg=0.0001,
+                                                           koef_reg=0.0001,
+                                                           activation_on_code='sigmoid',
+                                                           drop_in_decoder=0.4,
+                                                           drop_in_encoder=0.4)
 
 # fit
 print("fit model to data..")
