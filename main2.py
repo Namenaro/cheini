@@ -26,7 +26,7 @@ NAME = "ZINA"
 # create
 print("create model...")
 encoding_dim = 3
-encoder, decoder, autoencoder = simple_nets.create_ae_ZINA(encoding_dim=4,
+encoder, decoder, autoencoder = simple_nets.create_ae_ZINA(encoding_dim=5,
                                                            input_data_shape=foveas01[0].shape,
                                                            a_koef_reg=0.0001,
                                                            koef_reg=0.0001,

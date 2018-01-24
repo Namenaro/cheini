@@ -188,7 +188,7 @@ def create_ae_ZINA(encoding_dim, input_data_shape, activation_on_code, koef_reg,
     print("flatten shape = " + str(flatten_data_len))
     flat_decoded = Dense(flatten_data_len,
                          activation='sigmoid',
-                         name='YANA',
+                         name='ZINA',
                          kernel_regularizer=w_reg,
                          bias_regularizer=b_reg
                          )(d_input_encoded)
