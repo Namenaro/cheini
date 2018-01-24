@@ -101,3 +101,19 @@ def draw_mat(matrix):
     cax = ax.matshow(matrix, vmin=-abs_max, vmax=abs_max)
     fig.colorbar(cax)
     plt.show()
+
+def trash():
+    a = np.array([[2.1, 3], [4, 5]])
+    b = np.array([[3, 4], [5, 6]])
+    abs_dif = np.absolute(b-a)
+    energy = abs_dif.sum()
+    print (str(energy))
+
+def energy_change(a, b):
+    if a.shape == b.shape:
+        abs_dif = np.absolute(b - a)
+        energy = abs_dif.sum()
+        num_of_items = np.prod(a.shape[:])
+        return energy/num_of_items
+    else:
+        return None

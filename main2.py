@@ -141,6 +141,27 @@ def visualise_weights_and_biases(model, name_of_layer):
 visualise_weights_and_biases(decoder, "MASHA")
 
 # 7. График действия ( н-1 точек, значение точки = сумма измененией (по модулю) попиксельно между соседними фреймами
+def energy_of_pic_sequence(pic_sequence):
+    if len(pic_sequence) < 2:
+        return None
+    energies = []
+
+    #ыуммируем разницу между текущим и предыдущим
+    for i in range(1, len(pic_sequence)):
+        curr = pic_sequence[i]
+        prev = pic_sequence[i-1]
+        energies.append(utils.energy_change(prev, curr))
+    everall_energy = np.array(energies).sum()
+    plt.plot(range(len(pic_sequence) - 1), energies, 'g^')
+    plt.title("energy of foveals path")
+    plt.xlabel("number of step (n - 1)")
+    plt.ylabel("avg abs energy per pixel")
+    plt.ylim(0, 1.1)
+    plt.show()
+    return everall_energy
+
+energy_over_path = energy_of_pic_sequence(foveas01)
+print ("energy over path = " + str(energy_over_path))
 
 # 8. визуализировать скрытую репрезентацию
 plt.imshow(encoded_imgs, cmap='gray') # там много интересных параметров в этой ф-ции, читать доки!
@@ -174,9 +195,17 @@ x_train_noisy = add_noise(foveas01, noise_factor=0.01, visualise=True)
 
 # 10. Энергия скрытого многообразия
 
-
 # 11. сохраение весов и сети
+def save_all(encoder, decoder, autoencoder):
+    #https://keras.io/getting-started/faq/#how-can-i-save-a-keras-model
+    encoder.save('encoder.h5')
+    decoder.save('decoder.h5')
+    autoencoder.save('autoencoder.h5')
+
+save_all(encoder, decoder, autoencoder)
+
 # 12. energy (entropy) per frame
+#https://jamesmccaffrey.wordpress.com/2012/12/16/calculating-the-entropy-of-data-in-a-table-or-matrix/
 
 # 13. Средний модуль веса и биаса в обученной сети
 def get_abs_avg_wbiases(model, name_of_layer):
@@ -185,12 +214,11 @@ def get_abs_avg_wbiases(model, name_of_layer):
     biases = w[1]
     mw = (np.absolute(weights)).mean()
     mb = (np.absolute(biases)).mean()
-    print ("mean(w)=" + str(mw) + ", mean(b)=" + str(mb))
+    print("mean(w)=" + str(mw) + ", mean(b)=" + str(mb))
 
 get_abs_avg_wbiases(decoder, "MASHA")
 
-# 14. Гистограмма весов и биасов
-# 15. Гисторамма активаций
+
 
 ############################ STAGE 4 #############################################
 ########################## save summary ##########################################
