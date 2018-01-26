@@ -126,3 +126,26 @@ def get_image_for_report(path, width=8*cm):
     iw, ih = img.getSize()
     aspect = ih / float(iw)
     return Image(path, width=width, height=(width * aspect))
+
+# 9. Тест шумом
+def add_noise_to_dataset(dataset, noise_factor=0.01, to_plt=True):
+    x_train_noisy = dataset + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=dataset.shape)
+    x_train_noisy = np.clip(x_train_noisy, 0., 1.)
+    n = len(dataset)
+    if to_plt:
+        plt.figure(figsize=(10, 2))
+        for i in range(n):
+            # display original
+            ax = plt.subplot(2, n, i + 1)
+            ax.set_title("before " + str(i))
+            plt.imshow(dataset[i], cmap='gray', vmax=1.0, vmin=0.0)
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+            # display with noise
+            ax = plt.subplot(2, n, i + 1 + n)
+            plt.imshow(x_train_noisy[i], cmap='gray', vmax=1.0, vmin=0.0)
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+    return x_train_noisy

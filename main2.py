@@ -75,6 +75,7 @@ class ReportOnPath:
         self.visualise_reconstruction()
         self.visualise_manifold_2d(i=0, j=1)
         self.kinetik_energy_of_input_sequence()
+        self.code_visualise()
 
     def report_loss_decrease(self):
         # График сходимости
@@ -168,6 +169,23 @@ class ReportOnPath:
         self._add_img_to_report(filename)
         self._add_to_summary('kinetik energy of input', overall_energy)
         self._add_text_to_report('kinetik energy of input = ' + str(overall_energy))
+
+    def code_visualise(self):
+        encoded_imgs = self.encoder.predict(self.dataset)
+        plt.imshow(encoded_imgs, cmap='gray')
+        filename = "hidden codes.png"
+        self._savefig(filename)
+        self._add_img_to_report(filename)
+
+        mmean_activation = (np.absolute(encoded_imgs)).mean()
+        max_activation = (np.absolute(encoded_imgs)).max()
+        max_to_mean = max_activation/mmean_activation
+        self._add_text_to_report("codes -> mean:"+str(mmean_activation) + ", max/mean=" + str(max_to_mean))
+        self._add_to_summary('code_mean', mmean_activation)
+        self._add_to_summary('code_max', max_activation)
+        self._add_to_summary('code_max_to_min', max_to_mean)
+
+
 
     def _energy_of_sequence(self, pic_sequence):
         if len(pic_sequence) < 2:

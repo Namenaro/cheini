@@ -21,56 +21,12 @@ def visualise_weights_and_biases(model, name_of_layer):
 
 visualise_weights_and_biases(decoder, NAME)
 
-# 7. График действия ( н-1 точек, значение точки = сумма измененией (по модулю) попиксельно между соседними фреймами
-def energy_of_pic_sequence(pic_sequence):
-    if len(pic_sequence) < 2:
-        return None
-    energies = []
-
-    #ыуммируем разницу между текущим и предыдущим
-    for i in range(1, len(pic_sequence)):
-        curr = pic_sequence[i]
-        prev = pic_sequence[i-1]
-        energies.append(utils.energy_change(prev, curr))
-    everall_energy = np.array(energies).sum()
-    plt.plot(range(len(pic_sequence) - 1), energies, 'g^')
-    plt.title("energy of foveals path")
-    plt.xlabel("number of step (n - 1)")
-    plt.ylabel("avg abs energy per pixel")
-    plt.ylim(0, 1.1)
-    plt.show()
-    return everall_energy
-
-energy_over_path = energy_of_pic_sequence(foveas01)
-print ("energy over path = " + str(energy_over_path))
 
 # 8. визуализировать скрытую репрезентацию
 plt.imshow(encoded_imgs, cmap='gray') # там много интересных параметров в этой ф-ции, читать доки!
 
-# 9. Тест шумом
-def add_noise(dataset, noise_factor, visualise=True):
-    x_train_noisy = dataset + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=dataset.shape)
-    x_train_noisy = np.clip(x_train_noisy, 0., 1.)
-    n_len = len(dataset)
-    if visualise:
-        plt.figure(figsize=(10, 2))
-        for i in range(n_len):
-            # display original
-            ax = plt.subplot(2, n, i + 1)
-            ax.set_title("before " + str(i))
-            plt.imshow(dataset[i], cmap='gray', vmax=1.0, vmin=0.0)
-            ax.get_xaxis().set_visible(False)
-            ax.get_yaxis().set_visible(False)
 
-            # display with noise
-            ax = plt.subplot(2, n, i + 1 + n)
-            plt.imshow(x_train_noisy[i], cmap='gray', vmax=1.0, vmin=0.0)
-            ax.get_xaxis().set_visible(False)
-            ax.get_yaxis().set_visible(False)
-        plt.show()
-    return x_train_noisy
 
-x_train_noisy = add_noise(foveas01, noise_factor=0.01, visualise=True)
 
 # 10. Энергия скрытого многообразия
 
