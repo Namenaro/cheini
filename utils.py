@@ -7,6 +7,9 @@ import glob
 import easygui
 import cv2
 import numpy as np
+from reportlab.lib import utils
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 
 def ask_user_for_name():
     msg = "Enter name for folder"
@@ -117,3 +120,9 @@ def energy_change(a, b):
         return energy/num_of_items
     else:
         return None
+
+def get_image_for_report(path, width=8*cm):
+    img = utils.ImageReader(path)
+    iw, ih = img.getSize()
+    aspect = ih / float(iw)
+    return Image(path, width=width, height=(width * aspect))

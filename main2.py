@@ -14,7 +14,7 @@ from reportlab.lib.enums import TA_JUSTIFY
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
+from reportlab.lib.units import cm
 
 
 
@@ -74,6 +74,7 @@ class ReportOnPath:
         self.report_loss_decrease()
         self.visualise_reconstruction()
         self.visualise_manifold_2d(i=0, j=1)
+        self.kinetik_energy_of_input_sequence()
 
     def report_loss_decrease(self):
         # График сходимости
@@ -153,8 +154,34 @@ class ReportOnPath:
         self._savefig(filename2)
         self._add_text_to_report(filename2)
 
+    def kinetik_energy_of_input_sequence(self):
+        energies = self._energy_of_sequence(self.dataset)
+        overall_energy = np.array(energies).sum()
+        plt.plot(range(len(self.dataset) - 1), energies, 'g^')
+        plt.title("energy of foveals path")
+        plt.xlabel("number of step (n - 1)")
+        plt.ylabel("avg abs energy per 1 (!!!!!) pixel")
+        plt.ylim(0, 1.1)
+        filename = 'energy of foveals path.png'
+        self._savefig(filename)
+        self._add_text_to_report("energy of INPUT sequence")
+        self._add_img_to_report(filename)
+        self._add_to_summary('kinetik energy of input', overall_energy)
+        self._add_text_to_report('kinetik energy of input = ' + str(overall_energy))
+
+    def _energy_of_sequence(self, pic_sequence):
+        if len(pic_sequence) < 2:
+            return 0
+        energies = []
+        # ыуммируем разницу между текущим и предыдущим
+        for i in range(1, len(pic_sequence)):
+            curr = pic_sequence[i]
+            prev = pic_sequence[i - 1]
+            energies.append(utils.energy_change(prev, curr))
+        return energies
+
     def _add_img_to_report(self, img_name):
-        im = Image(img_name, 4 * inch, 4 * inch)
+        im = utils.get_image_for_report(img_name, width=8*cm)
         self.story.append(im)
 
     def _savefig(self, filename):

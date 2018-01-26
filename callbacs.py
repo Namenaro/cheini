@@ -1,44 +1,6 @@
 
 
 
-# 4. Визаулизировать многообразие: точками в СО многообразия
-encoded_imgs = encoder.predict(foveas01)
-def visualise_points_manifold(encoded_images, i=0, j=1):
-    plt.figure(figsize=(6, 6))
-    plt.scatter(encoded_images[:, i], encoded_images[:, j], c=range(0, len(encoded_images)))
-    plt.colorbar()
-    plt.show()
-
-visualise_points_manifold(encoded_imgs, 0, 1)
-
-# 5. Визуализировать многообразие: картинками, пробегая по решетке кодов 2д
-# display a 2D manifold of the digits
-
-def visualise_points_manifold(imgs, i=0, j=1):
-    encoded_imgs = encoder.predict(imgs)
-    grid_n = 15
-    pic_side = imgs[0].shape[0] # картинки типа всегда квадратыне
-    figure = np.zeros((pic_side * grid_n, pic_side * grid_n))
-
-    grid_x = np.linspace(2*min(encoded_imgs[:, i]), 2*max(encoded_imgs[:, i]), grid_n)
-    grid_y = np.linspace(2*min(encoded_imgs[:, j]), 2*max(encoded_imgs[:, j]), grid_n)
-
-    for ix, xi in enumerate(grid_x):
-        for iy, yi in enumerate(grid_y):
-            code = encoded_imgs[0]
-            code[i] = xi
-            code[j] = yi
-            decoded_images = decoder.predict(np.array([code]), batch_size=1)
-            figure[ix * pic_side: (ix + 1) * pic_side,
-                   iy * pic_side: (iy + 1) * pic_side] = decoded_images[0]
-
-    plt.figure(figsize=(10, 10))
-    plt.imshow(figure, cmap='gray', vmax=1.0, vmin=0.0)
-    plt.show()
-
-
-visualise_points_manifold(foveas01, 0, 1)
-
 # 6. Визуализация весов как картинки
 def visualise_weights_and_biases(model, name_of_layer):
     w = model.get_layer(name_of_layer).get_weights()
