@@ -4,6 +4,7 @@ import copy
 import cv2
 import numpy as np
 import utils
+import matplotlib.pyplot as plt
 
 
 events = [i for i in dir(cv2) if 'EVENT' in i]
@@ -62,3 +63,17 @@ for i in range(len(coordinateStore1.points)):
 restored_points = utils.open_file('points.pkl')
 print("points: " + str(restored_points))
 
+# visualise foveas
+foveas01 = utils.scale_dataset_to01(coordinateStore1.foveas)
+foveas01 = np.array(foveas01)
+n = len(foveas01)
+plt.figure(figsize=(10, 2))
+for i in range(n):
+    # display original
+    ax = plt.subplot(2, n, i + 1)
+    ax.set_title( "original " + str(i))
+    plt.imshow(foveas01[i], cmap='gray', vmax=1.0, vmin=0.0)
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+plt.show()
