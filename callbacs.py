@@ -30,14 +30,8 @@ plt.imshow(encoded_imgs, cmap='gray') # там много интересных �
 
 # 10. Энергия скрытого многообразия
 
-# 11. сохраение весов и сети
-def save_all(encoder, decoder, autoencoder):
-    #https://keras.io/getting-started/faq/#how-can-i-save-a-keras-model
-    encoder.save('encoder.h5')
-    decoder.save('decoder.h5')
-    autoencoder.save('autoencoder.h5')
 
-save_all(encoder, decoder, autoencoder)
+
 
 # 12. energy (entropy) per frame
 #https://jamesmccaffrey.wordpress.com/2012/12/16/calculating-the-entropy-of-data-in-a-table-or-matrix/

@@ -149,3 +149,9 @@ def add_noise_to_dataset(dataset, noise_factor=0.01, to_plt=True):
             ax.get_yaxis().set_visible(False)
 
     return x_train_noisy
+
+def save_all(encoder, decoder, autoencoder):
+    #https://keras.io/getting-started/faq/#how-can-i-save-a-keras-model
+    encoder.save('encoder.h5')
+    decoder.save('decoder.h5')
+    autoencoder.save('autoencoder.h5')

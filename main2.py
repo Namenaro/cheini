@@ -36,7 +36,6 @@ def main():
 
     # fit
     print("fit model to data..")
-
     sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
     ae.compile(optimizer=sgd, loss='mean_squared_error')
 
@@ -54,6 +53,7 @@ def main():
     report.create_summary()
     summary = report.end()
     print (summary)
+    utils.save_all(encoder=en, decoder=de, autoencoder=ae)
 
 class ReportOnPath:
     def __init__(self, ae, en, de, history_obj, dataset, experiment_name, SHOW=False):
