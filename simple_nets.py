@@ -7,7 +7,6 @@ from keras.regularizers import l2, l1
 
 def create_ae_MASHA(encoding_dim, input_data_shape, activation_on_code):
     summary = "без регуляризации, из инпута сразу в код, из кода сразу в выход "
-    name_of_last_layer = 'MASHA'
     # Энкодер
     # Входной плейсхолдер
     input_img = Input(shape=input_data_shape)  # 28, 28, 1 - размерности строк, столбцов, фильтров одной картинки, без батч-размерности
@@ -21,7 +20,9 @@ def create_ae_MASHA(encoding_dim, input_data_shape, activation_on_code):
     input_encoded = Input(shape=(encoding_dim,))
     flatten_data_len = np.prod(input_data_shape[:])
     print("flatten shape = " + str(flatten_data_len))
-    flat_decoded = Dense(flatten_data_len, activation='sigmoid', name=name_of_last_layer)(input_encoded)
+    flat_decoded = Dense(flatten_data_len,
+                         activation='sigmoid',
+                         name="decoder_layer")(input_encoded)
     decoded = Reshape(input_data_shape)(flat_decoded)
 
     encoder = Model(input_img, encoded, name="encoder")
@@ -42,14 +43,17 @@ def create_ae_ANYA(encoding_dim, input_data_shape, activation_on_code, koef_reg)
     encoded = Dense(encoding_dim,
                     activation=activation_on_code,
                     kernel_regularizer=w_reg,
-                    bias_regularizer=b_reg)(flat_img)
+                    bias_regularizer=b_reg,
+                    name="encoder_layer")(flat_img)
 
     # Декодер
     # Раскодированное другим полносвязным слоем изображение
     input_encoded = Input(shape=(encoding_dim,))
     flatten_data_len = np.prod(input_data_shape[:])
     print("flatten shape = " + str(flatten_data_len))
-    flat_decoded = Dense(flatten_data_len, activation='sigmoid', name='ANYA')(input_encoded)
+    flat_decoded = Dense(flatten_data_len,
+                         activation='sigmoid',
+                         name="decoder_layer")(input_encoded)
     decoded = Reshape(input_data_shape)(flat_decoded)
 
     encoder = Model(input_img, encoded, name="encoder")
@@ -70,7 +74,8 @@ def create_ae_MILA(encoding_dim, input_data_shape, activation_on_code, koef_reg)
     encoded = Dense(encoding_dim,
                     activation=activation_on_code,
                     kernel_regularizer=w_reg,
-                    bias_regularizer=b_reg)(flat_img)
+                    bias_regularizer=b_reg,
+                    name="encoder_layer")(flat_img)
 
     # Декодер
     # Раскодированное другим полносвязным слоем изображение
@@ -79,7 +84,7 @@ def create_ae_MILA(encoding_dim, input_data_shape, activation_on_code, koef_reg)
     print("flatten shape = " + str(flatten_data_len))
     flat_decoded = Dense(flatten_data_len,
                          activation='sigmoid',
-                         name='MILA',
+                         name="decoder_layer",
                          kernel_regularizer=w_reg,
                          bias_regularizer=b_reg
                          )(input_encoded)
@@ -104,7 +109,8 @@ def create_ae_IRA(encoding_dim, input_data_shape, activation_on_code, koef_reg):
     encoded = Dense(encoding_dim,
                     activation=activation_on_code,
                     kernel_regularizer=w_reg,
-                    bias_regularizer=b_reg)(flat_img)
+                    bias_regularizer=b_reg,
+                    name="encoder_layer")(flat_img)
 
     # Декодер
     # Раскодированное другим полносвязным слоем изображение
@@ -113,7 +119,7 @@ def create_ae_IRA(encoding_dim, input_data_shape, activation_on_code, koef_reg):
     print("flatten shape = " + str(flatten_data_len))
     flat_decoded = Dense(flatten_data_len,
                          activation='sigmoid',
-                         name='IRA',
+                         name="decoder_layer",
                          kernel_regularizer=w_reg,
                          bias_regularizer=b_reg
                          )(input_encoded)
@@ -139,7 +145,8 @@ def create_ae_YANA(encoding_dim, input_data_shape, activation_on_code, koef_reg,
                     activation=activation_on_code,
                     kernel_regularizer=w_reg,
                     bias_regularizer=b_reg,
-                    activity_regularizer=a_reg)(flat_img)
+                    activity_regularizer=a_reg,
+                    name="encoder_layer")(flat_img)
 
     # Декодер
     # Раскодированное другим полносвязным слоем изображение
@@ -148,7 +155,7 @@ def create_ae_YANA(encoding_dim, input_data_shape, activation_on_code, koef_reg,
     print("flatten shape = " + str(flatten_data_len))
     flat_decoded = Dense(flatten_data_len,
                          activation='sigmoid',
-                         name='YANA',
+                         name="decoder_layer",
                          kernel_regularizer=w_reg,
                          bias_regularizer=b_reg
                          )(input_encoded)
@@ -178,7 +185,8 @@ def create_ae_ZINA(encoding_dim, input_data_shape, activation_on_code, koef_reg,
                     activation=activation_on_code,
                     kernel_regularizer=w_reg,
                     bias_regularizer=b_reg,
-                    activity_regularizer=a_reg)(d_flat_img)
+                    activity_regularizer=a_reg,
+                    name="encoder_layer")(d_flat_img)
 
     # Декодер
     # Раскодированное другим полносвязным слоем изображение
@@ -188,9 +196,9 @@ def create_ae_ZINA(encoding_dim, input_data_shape, activation_on_code, koef_reg,
     print("flatten shape = " + str(flatten_data_len))
     flat_decoded = Dense(flatten_data_len,
                          activation='sigmoid',
-                         name='ZINA',
                          kernel_regularizer=w_reg,
-                         bias_regularizer=b_reg
+                         bias_regularizer=b_reg,
+                         name="decoder_layer"
                          )(d_input_encoded)
     decoded = Reshape(input_data_shape)(flat_decoded)
 

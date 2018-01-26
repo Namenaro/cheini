@@ -76,6 +76,8 @@ class ReportOnPath:
         self.visualise_manifold_2d(i=0, j=1)
         self.kinetik_energy_of_input_sequence()
         self.code_visualise()
+        self.analise_encoder_params()
+        self.analise_decoder_params()
 
     def report_loss_decrease(self):
         # График сходимости
@@ -197,6 +199,46 @@ class ReportOnPath:
             prev = pic_sequence[i - 1]
             energies.append(utils.energy_change(prev, curr))
         return energies
+
+    def analise_encoder_params(self):
+        self._analise_layer(self.encoder, 'encoder_layer')
+
+    def analise_decoder_params(self):
+        self._analise_layer(self.decoder, 'decoder_layer')
+
+    def _analise_layer(self, keras_model, layer_name):
+        w = keras_model.get_layer(layer_name).get_weights()
+        weights = w[0]
+        biases = w[1]
+        print("w_shape=" + str(weights.shape) + ", b_shape=" + str(biases.shape))
+
+        wmin = weights.min()
+        wmax = weights.max()
+        bmin = biases.min()
+        bmax = biases.max()
+        abs_max = max(abs(bmax), abs(bmin), abs(wmax), abs(wmin))
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+        cax = ax1.matshow(weights, vmin=-abs_max, vmax=abs_max, cmap='bwr')
+        cax = ax2.matshow([biases], vmin=-abs_max, vmax=abs_max, cmap='bwr')
+        fig.colorbar(cax)
+        filename = "FIRST (encoder) layer.png"
+        self._savefig(filename)
+        self._add_img_to_report(filename)
+
+        mean_w = (np.absolute(weights)).mean()
+        max_w = (np.absolute(weights)).max()
+        w_max_to_mean = max_w / mean_w
+        self._add_text_to_report(layer_name + " Weights -> mean:" + str(mean_w) + ", max/mean=" + str(w_max_to_mean))
+        self._add_to_summary('w_mean', mean_w)
+        self._add_to_summary('w_max', max_w)
+        self._add_to_summary('w_max_to_min', w_max_to_mean)
+
+        mean_b = (np.absolute(biases)).mean()
+        max_b = (np.absolute(biases)).max()
+        b_max_to_mean = max_b /mean_b
+        self._add_text_to_report(layer_name + " Biases -> mean:" + str(mean_b) + ", max/mean=" + str(b_max_to_mean))
+        self._add_to_summary('wb_ratio_mean', mean_w/mean_b)
+        self._add_to_summary('b_mean', mean_b)
 
     def _add_img_to_report(self, img_name):
         im = utils.get_image_for_report(img_name, width=8*cm)
