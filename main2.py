@@ -73,6 +73,7 @@ class ReportOnPath:
     def create_summary(self):
         self.report_loss_decrease()
         self.visualise_reconstruction()
+        self.visualise_manifold_2d(i=0, j=1)
 
     def report_loss_decrease(self):
         # График сходимости
@@ -114,6 +115,43 @@ class ReportOnPath:
             ax.get_yaxis().set_visible(False)
         self._savefig("reconstruction.png")
         self._add_img_to_report("reconstruction.png")
+
+    def visualise_manifold_2d(self, i, j):
+        self._add_text_to_report("visualise manifold by " + str(i) + ", " + str(j))
+        # Визаулизировать многообразие: точками в СО многообразия
+        encoded_imgs = self.encoder.predict(self.dataset)
+        code_len = len(encoded_imgs[0])
+        if i >= code_len or j >= code_len:
+            return None
+        plt.figure(figsize=(6, 6))
+        plt.scatter(encoded_imgs[:, i], encoded_imgs[:, j], c=range(0, len(encoded_imgs)))
+        plt.colorbar()
+        filename=str(i) + "_" + str(j) +"_manifold(as points).png"
+        self._savefig(filename)
+        self._add_img_to_report(filename)
+
+        # Визуализировать многообразие: картинками, пробегая по решетке кодов 2д
+        grid_n = 15
+        pic_side = self.dataset[0].shape[0]  # картинки типа всегда квадратыне
+        figure = np.zeros((pic_side * grid_n, pic_side * grid_n))
+
+        grid_x = np.linspace(2 * min(encoded_imgs[:, i]), 2 * max(encoded_imgs[:, i]), grid_n)
+        grid_y = np.linspace(2 * min(encoded_imgs[:, j]), 2 * max(encoded_imgs[:, j]), grid_n)
+
+        for ix, xi in enumerate(grid_x):
+            for iy, yi in enumerate(grid_y):
+                code = encoded_imgs[0]
+                code[i] = xi
+                code[j] = yi
+                decoded_images = self.decoder.predict(np.array([code]), batch_size=1)
+                figure[ix * pic_side: (ix + 1) * pic_side,
+                iy * pic_side: (iy + 1) * pic_side] = decoded_images[0]
+
+        plt.figure(figsize=(10, 10))
+        plt.imshow(figure, cmap='gray', vmax=1.0, vmin=0.0)
+        filename2 = str(i) + "_" + str(j) + "_manifold(as pictures).png"
+        self._savefig(filename2)
+        self._add_text_to_report(filename2)
 
     def _add_img_to_report(self, img_name):
         im = Image(img_name, 4 * inch, 4 * inch)
