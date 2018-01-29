@@ -34,7 +34,7 @@ class Serial:
         self.code_len = [2]
         self.num_epochs = [100, 200, 300]
         self.activation = ['sigmoid', 'relu']
-        self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\dammy\\foveas.pkl']
+        self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\const_part_and_dyn_other\\foveas.pkl']
 
     def get_all_cominations(self):
         """
@@ -118,6 +118,7 @@ class Experiment:
         utils.save_all(encoder=en, decoder=de, autoencoder=ae)
 
 if __name__ == "__main__":
+    utils.setup_folder_for_results("SERIES")
     s = Serial()
     s.get_arrays()
     n = len(s.get_all_cominations())
