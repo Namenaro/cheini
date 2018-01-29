@@ -21,7 +21,7 @@ from reportlab.lib.units import cm
 def main():
     name = utils.ask_user_for_name()  # выбрать папку для сохранения результатов
     # вытаскиваем датасет из файла
-    foveas01, points = utils.get_dataset(READ_DAMMY=True)
+    foveas01 = utils.get_dataset(READ_DAMMY=True)
 
     #создаем и обучаем модельку
     encoding_dim = 2
@@ -48,7 +48,7 @@ def main():
                               callbacks=[early_stopping])
 
     # по результатам обучения на этом датасетке генерим репорт
-    report = ReportOnPath(ae=ae, en=en, de=de, dataset=foveas01, experiment_name=name, history_obj=history)
+    report = ReportOnPath(ae=ae, en=en, de=de, dataset=foveas01, history_obj=history)
     report.setup()
     report.create_summary()
     summary = report.end()
@@ -56,19 +56,15 @@ def main():
     utils.save_all(encoder=en, decoder=de, autoencoder=ae)
 
 class ReportOnPath:
-    def __init__(self, ae, en, de, history_obj, dataset, experiment_name, SHOW=False):
+    def __init__(self, ae, en, de, history_obj, dataset, SHOW=False):
         self.autoencoder = ae
         self.history_obj = history_obj
         self.encoder = en
         self.decoder = de
         self.dataset = dataset
-        self.exp_name = experiment_name
         self.story = []
         self.summary = {}
         self.SHOW = SHOW
-
-    def setup(self):
-        utils.setup_folder_for_results(self.exp_name)
 
     def create_summary(self):
         self.report_loss_decrease()
@@ -267,6 +263,5 @@ class ReportOnPath:
         return self.summary
 
 ##################################################################################
-
-
-#main()
+if __name__ == "__main__":
+    main()

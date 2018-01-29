@@ -1,6 +1,24 @@
 # -*- coding: utf-8 -*
 
 import itertools
+import one_experiment_report
+import utils
+import simple_nets
+from math import floor, ceil
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+from keras.callbacks import EarlyStopping
+from keras.callbacks import TensorBoard
+from keras import optimizers
+import time
+from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+
 
 # варьируем один (или несколько) гиперпараметр - проводим таким образом серию экспериментов,
 # результаты серии сводим в единый отчет: таблица из 2 столбцов (что вариьровали) и (за чем следили)
@@ -13,9 +31,10 @@ class Serial:
         self.activation = None
 
     def get_arrays(self):
-        self.code_len = [1]
-        self.num_epochs = [600, 700, 900]
+        self.code_len = [2]
+        self.num_epochs = [100, 200, 300]
         self.activation = ['sigmoid', 'relu']
+        self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\dammy\\foveas.pkl']
 
     def get_all_cominations(self):
         """
@@ -46,9 +65,18 @@ class Serial:
         return all_dicts
 
     def make_experiments(self, all_dicts):
+        experiment_id = 0
+        folder_name = utils.ask_user_for_name()  # выбрать имя серии
+        if folder_name is None:
+            exit()
+        utils.setup_folder_for_results(folder_name)
+        folder_full_path = os.getcwd()
         for params in all_dicts:
+            utils.setup_folder_for_results(str(experiment_id))  # имя эксперимента в серии
             e = Experiment(params)
             e.run_it()
+            experiment_id += 1
+            os.chdir(folder_full_path)  # обратно в папку серии
 
 class Experiment:
     def __init__(self, dictionary):
@@ -56,11 +84,45 @@ class Experiment:
             setattr(self, k, v)
 
     def run_it(self):
-        print("RUN: " + str(self.__dict__) )
+        print("RUN: " + str(self.__dict__))
+        # вытаскиваем датасет из файла
+        foveas01 = utils.get_dataset(self.dataset)
 
-s = Serial()
-s.get_arrays()
-s.make_experiments(s.get_all_cominations())
+        # создаем и обучаем модельку
+        en, de, ae = simple_nets.create_ae_ZINA(encoding_dim=self.code_len,
+                                                input_data_shape=foveas01[0].shape,
+                                                a_koef_reg=0.001,
+                                                koef_reg=0.0001,
+                                                activation_on_code=self.activation,
+                                                drop_in_decoder=0.1,
+                                                drop_in_encoder=0.1)
+
+        sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        ae.compile(optimizer=sgd, loss='mean_squared_error')
+
+        early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
+        history = ae.fit(foveas01, foveas01,
+                         epochs=self.num_epochs,
+                         batch_size=ceil(len(foveas01) / 2),
+                         shuffle=True,
+                         validation_data=(foveas01, foveas01),
+                         callbacks=[early_stopping])
+
+        # по результатам обучения на этом датасетке генерим репорт
+        report = one_experiment_report.ReportOnPath(ae=ae, en=en, de=de,
+                                                    dataset=foveas01,
+                                                    history_obj=history)
+        report.create_summary()
+        summary = report.end()
+        print(summary)
+        utils.save_all(encoder=en, decoder=de, autoencoder=ae)
+
+if __name__ == "__main__":
+    s = Serial()
+    s.get_arrays()
+    n = len(s.get_all_cominations())
+    print ("there will be :"  + str(n) + " experiments!")
+    s.make_experiments(s.get_all_cominations())
 
 
 
