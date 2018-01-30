@@ -32,8 +32,8 @@ class Serial:
 
     def get_arrays(self):
         self.code_len = [2]
-        self.num_epochs = [100, 200, 300]
-        self.activation = ['sigmoid', 'relu']
+        self.num_epochs = [100, 200]
+        self.activation = ['sigmoid']
         self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\const_part_and_dyn_other\\foveas.pkl']
 
     def get_all_cominations(self):
@@ -65,6 +65,7 @@ class Serial:
         return all_dicts
 
     def make_experiments(self, all_dicts):
+        summaries = []
         experiment_id = 0
         folder_name = utils.ask_user_for_name()  # выбрать имя серии
         if folder_name is None:
@@ -74,9 +75,11 @@ class Serial:
         for params in all_dicts:
             utils.setup_folder_for_results(str(experiment_id))  # имя эксперимента в серии
             e = Experiment(params)
-            e.run_it()
+            summary = e.run_it()
+            summaries.append(summary)
             experiment_id += 1
             os.chdir(folder_full_path)  # обратно в папку серии
+        return summaries
 
 class Experiment:
     def __init__(self, dictionary):
@@ -114,8 +117,8 @@ class Experiment:
                                                     history_obj=history)
         report.create_summary()
         summary = report.end()
-        print(summary)
         utils.save_all(encoder=en, decoder=de, autoencoder=ae)
+        return summary
 
 if __name__ == "__main__":
     utils.setup_folder_for_results("SERIES")
@@ -123,7 +126,8 @@ if __name__ == "__main__":
     s.get_arrays()
     n = len(s.get_all_cominations())
     print ("there will be :"  + str(n) + " experiments!")
-    s.make_experiments(s.get_all_cominations())
+    summaries = s.make_experiments(s.get_all_cominations())
+    print (summaries)
 
 
 
