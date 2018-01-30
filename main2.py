@@ -18,6 +18,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
+import pandas as pd
 
 
 # варьируем один (или несколько) гиперпараметр - проводим таким образом серию экспериментов,
@@ -76,6 +77,7 @@ class Serial:
             utils.setup_folder_for_results(str(experiment_id))  # имя эксперимента в серии
             e = Experiment(params)
             summary = e.run_it()
+            summary['experiment_name'] = experiment_id
             summaries.append(summary)
             experiment_id += 1
             os.chdir(folder_full_path)  # обратно в папку серии
@@ -127,7 +129,8 @@ if __name__ == "__main__":
     n = len(s.get_all_cominations())
     print ("there will be :"  + str(n) + " experiments!")
     summaries = s.make_experiments(s.get_all_cominations())
-    print (summaries)
+    results_table = pd.DataFrame(summaries)
+    print(results_table)
 
 
 
