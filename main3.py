@@ -47,6 +47,12 @@ def analize_summaries(summaries):
     sns.pairplot(some_columns, hue='dataset')
     plt.show()
 
+    # опарные коэффициенты корреляции между всеми столбцами. Каждая клетка - корр.коэф.между двумя переменными
+    corr_mat = df.corr()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(corr_mat, vmax=1.0, square=True, ax=ax, cmap='bwr')
+    plt.show()
+
 
 
 
