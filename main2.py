@@ -8,6 +8,7 @@ from math import floor, ceil
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import _pickle as pickle
 
 from keras.callbacks import EarlyStopping
 from keras.callbacks import TensorBoard
@@ -18,7 +19,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
-import pandas as pd
+
 
 
 # варьируем один (или несколько) гиперпараметр - проводим таким образом серию экспериментов,
@@ -33,9 +34,11 @@ class Serial:
 
     def get_arrays(self):
         self.code_len = [2]
-        self.num_epochs = [100, 200]
+        self.a_koef_reg = [0.001]
+        self.num_epochs = [100, 500, 1000]
         self.activation = ['sigmoid']
-        self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\const_part_and_dyn_other\\foveas.pkl']
+        self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\const_part_and_dyn_other\\foveas.pkl',
+                        'C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\no_const_but_struct - move by gradient (very simple)\\foveas.pkl']
 
     def get_all_cominations(self):
         """
@@ -96,7 +99,7 @@ class Experiment:
         # создаем и обучаем модельку
         en, de, ae = simple_nets.create_ae_ZINA(encoding_dim=self.code_len,
                                                 input_data_shape=foveas01[0].shape,
-                                                a_koef_reg=0.001,
+                                                a_koef_reg=self.a_koef_reg,
                                                 koef_reg=0.0001,
                                                 activation_on_code=self.activation,
                                                 drop_in_decoder=0.1,
@@ -129,8 +132,8 @@ if __name__ == "__main__":
     n = len(s.get_all_cominations())
     print ("there will be :"  + str(n) + " experiments!")
     summaries = s.make_experiments(s.get_all_cominations())
-    results_table = pd.DataFrame(summaries)
-    print(results_table)
+    pickle.dump(summaries, open("summaries_dicts.pkl", "wb"))
+    print ("summaries is saved into: " + os.getcwd())
 
 
 
