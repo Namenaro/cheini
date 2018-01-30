@@ -4,6 +4,7 @@ import _pickle as pickle
 import utils
 import matplotlib.pyplot as plt
 import seaborn as sns
+#plt.xkcd() прикол!
 
 # здесь мы анализируем суммари
 def analize_summaries(summaries):
@@ -35,8 +36,15 @@ def analize_summaries(summaries):
     plt.show()
 
     #[5d] линейная зависимость, обучловленная на третью перевенную при еще двух дискретно-значных (col, row)
-    sns.lmplot(x="loss_decrease_ratio", y="w_mean", hue="dataset", col="drop_in_decoder", row="num_epochs", data=df)
+    sns.lmplot(x="loss_decrease_ratio", y="w_mean", hue="dataset", col="drop_in_decoder", row="num_epochs", data=df, size=3)
     plt.tight_layout()
+    plt.show()
+
+    #g = sns.pairplot(df, hue='dataset') все со всеми, очень тяжелый и долгий отрисован
+    # лучшая тулза поскать как ввлияет датасет на качественные законы взаимного распределения всех признаков!!!!
+    inpordant_columns = ['b_mean', 'w_mean', 'kinetik energy of input', 'dataset']
+    some_columns = df.loc[:,inpordant_columns]
+    sns.pairplot(some_columns, hue='dataset')
     plt.show()
 
 
