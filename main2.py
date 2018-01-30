@@ -36,6 +36,8 @@ class Serial:
         self.code_len = [2]
         self.a_koef_reg = [0.001]
         self.num_epochs = [100, 500, 1000]
+        self.drop_in_decoder = [0.1, 0.5]
+        self.drop_in_encoder = [0.1]
         self.activation = ['sigmoid']
         self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\const_part_and_dyn_other\\foveas.pkl',
                         'C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\no_const_but_struct - move by gradient (very simple)\\foveas.pkl']
@@ -81,7 +83,8 @@ class Serial:
             e = Experiment(params)
             summary = e.run_it()
             summary['experiment_name'] = experiment_id
-            summaries.append(summary)
+            all_report_line = {**params, **summary}
+            summaries.append(all_report_line)
             experiment_id += 1
             os.chdir(folder_full_path)  # обратно в папку серии
         return summaries
@@ -102,8 +105,8 @@ class Experiment:
                                                 a_koef_reg=self.a_koef_reg,
                                                 koef_reg=0.0001,
                                                 activation_on_code=self.activation,
-                                                drop_in_decoder=0.1,
-                                                drop_in_encoder=0.1)
+                                                drop_in_decoder=self.drop_in_decoder,
+                                                drop_in_encoder=self.drop_in_encoder)
 
         sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
         ae.compile(optimizer=sgd, loss='mean_squared_error')
