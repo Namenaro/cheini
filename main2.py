@@ -27,22 +27,16 @@ from reportlab.lib.units import cm
 #one_experiment_report.main()
 
 class Serial:
-    def __init__(self):
-        self.code_len = None
-        self.num_epochs = None
-        self.activation = None
-
-    def get_arrays(self):
-        self.code_len = [2]
+    def __init__(self, dataset):
+        self.code_len = [2, 3]
         self.a_koef_reg = [0.001]
-        self.num_epochs = [100, 500, 1000]
-        self.drop_in_decoder = [0.1, 0.5]
+        self.num_epochs = [100]
+        self.drop_in_decoder = [0.1]
         self.drop_in_encoder = [0.1]
         self.activation = ['sigmoid']
-        self.dataset = ['C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\const_part_and_dyn_other\\foveas.pkl',
-                        'C:\\Users\\neuro\\PycharmProjects\\cheini\\5x5\\no_const_but_struct - move by gradient (very simple)\\foveas.pkl']
+        self.dataset = dataset
 
-    def get_all_cominations(self):
+    def _get_all_cominations(self):
         """
         :return: список словарей - всех возхможных комбинаций значений гиперпараметров
         """
@@ -70,12 +64,15 @@ class Serial:
             all_dicts.append(d)
         return all_dicts
 
-    def make_experiments(self, all_dicts):
+    def make_experiments(self, folder_name=None):
+        all_dicts = self._get_all_cominations()
+        print("NUM EXPERIMENTS EXPECTED: " + str(len(all_dicts)))
         summaries = []
         experiment_id = 0
-        folder_name = utils.ask_user_for_name()  # выбрать имя серии
         if folder_name is None:
-            exit()
+            folder_name = utils.ask_user_for_name()  # выбрать имя серии
+            if folder_name is None:
+                exit()
         utils.setup_folder_for_results(folder_name)
         folder_full_path = os.getcwd()
         for params in all_dicts:
@@ -128,15 +125,25 @@ class Experiment:
         utils.save_all(encoder=en, decoder=de, autoencoder=ae)
         return summary
 
-if __name__ == "__main__":
+def make_seria_on_dataset(dataset, name_of_seria=None):
+    old_dir = os.getcwd()
     utils.setup_folder_for_results("SERIES")
-    s = Serial()
-    s.get_arrays()
-    n = len(s.get_all_cominations())
-    print ("there will be :"  + str(n) + " experiments!")
-    summaries = s.make_experiments(s.get_all_cominations())
+    s = Serial(dataset)
+    summaries = s.make_experiments(folder_name=name_of_seria)
     pickle.dump(summaries, open("summaries_dicts.pkl", "wb"))
-    print ("summaries is saved into: " + os.getcwd())
+    print("summaries is saved into: " + os.getcwd())
+    os.chdir(old_dir)
 
+if __name__ == "__main__":
+    dataset = ['C:\\5x5\\po conturu\\foveas.pkl',
+               'C:\\5x5\\po_conturu2\\foveas.pkl',
+               'C:\\5x5\\po_conturu3\\foveas.pkl',
+               'C:\\5x5\\slow_zifzag\\foveas.pkl']
 
+    make_seria_on_dataset(dataset, "test oximiron")
 
+    dataset = ['C:\\5x5\\const_gray\\foveas.pkl',
+               'C:\\5x5\\const_struct\\foveas.pkl',
+               'C:\\5x5\\const_noise\\foveas.pkl']
+
+    make_seria_on_dataset(dataset, "test gnoiny")

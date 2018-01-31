@@ -5,6 +5,7 @@ import utils
 import matplotlib.pyplot as plt
 import seaborn as sns
 #plt.xkcd() прикол!
+# https://www.tutorialspoint.com/python_pandas/python_pandas_dataframe.htm
 
 # здесь мы анализируем суммари
 def analize_summaries(summaries):
@@ -53,7 +54,30 @@ def analize_summaries(summaries):
     sns.heatmap(corr_mat, vmax=1.0, square=True, ax=ax, cmap='bwr')
     plt.show()
 
+    # посортировать по столбцу и взять чемпионов
+    champions = df.sort_values(by='wb_ratio_mean', ascending=False)[0:4]
+    print (champions)
+    print("the best one:")
+    print(champions.iloc[0])
 
+def exper(summaries):
+    df = pd.DataFrame(summaries)
+
+
+    inpordant_columns = ['b_mean', 'kinetik energy of input', 'w_max', 'dataset']
+    some_columns = df.loc[:, inpordant_columns]
+    sns.pairplot(some_columns, hue='dataset')
+    plt.show()
+
+    champions = some_columns.sort_values(by='b_mean', ascending=False)
+    print(champions)
+
+def exper2(summaries):
+    df = pd.DataFrame(summaries)
+    inpordant_columns = ['b_mean', 'w_max', 'num_epochs', 'dataset']
+    some_columns = df.loc[:, inpordant_columns]
+    sns.pairplot(some_columns, hue='num')
+    plt.show()
 
 
 def print_statistics(df):
@@ -61,7 +85,9 @@ def print_statistics(df):
     print(df.describe())
 
 if __name__ == "__main__":
-    path2 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\oximiron\\summaries_dicts.pkl'
-    path = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\real_series_1\\summaries_dicts.pkl'
-    summaries = utils.open_file(path2)
-    analize_summaries(summaries)
+    path2 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\biggest seria 108 exp\\summaries_dicts.pkl'
+    path1 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\108 experiments 3 neuron\\summaries_dicts.pkl'
+    summaries2 = utils.open_file(path2)
+    summaries1 = utils.open_file(path1)
+    summaries = summaries1 + summaries2
+    exper2(summaries)

@@ -5,6 +5,7 @@ import simple_nets
 from math import floor, ceil
 import matplotlib.pyplot as plt
 import numpy as np
+import itertools
 
 from keras.callbacks import EarlyStopping
 from keras.callbacks import TensorBoard
@@ -21,7 +22,7 @@ from reportlab.lib.units import cm
 def main():
     name = utils.ask_user_for_name()  # выбрать папку для сохранения результатов
     # вытаскиваем датасет из файла
-    foveas01 = utils.get_dataset(READ_DAMMY=True)
+    foveas01 = utils.get_dataset()
 
     #создаем и обучаем модельку
     encoding_dim = 2
@@ -49,7 +50,7 @@ def main():
 
     # по результатам обучения на этом датасетке генерим репорт
     report = ReportOnPath(ae=ae, en=en, de=de, dataset=foveas01, history_obj=history)
-    report.setup()
+
     report.create_summary()
     summary = report.end()
     print (summary)
@@ -120,6 +121,7 @@ class ReportOnPath:
         self._add_text_to_report("visualise manifold by " + str(i) + ", " + str(j))
         # Визаулизировать многообразие: точками в СО многообразия
         encoded_imgs = self.encoder.predict(self.dataset)
+        self.estimate_energy_on_manifold(encoded_imgs)
         code_len = len(encoded_imgs[0])
         if i >= code_len or j >= code_len:
             return None
@@ -184,6 +186,31 @@ class ReportOnPath:
         self._add_to_summary('code_max_to_min', max_to_mean)
 
 
+    def estimate_energy_on_manifold(self, codes):
+        bounds_arr = []
+        volume = 1
+        code_dimensionality = codes.shape[1]
+        center_coord = [None] * code_dimensionality
+        for i in range(code_dimensionality):
+            left_bound = min(codes[:, i])
+            right_bound = max(codes[:, i])
+            bounds_arr.append([left_bound, right_bound])
+            len_i = right_bound - left_bound
+            center_coord[i] = left_bound + 0.5 * len_i
+            volume *= len_i
+
+        vertexes = list(itertools.product(*bounds_arr))
+        print(str(vertexes))
+        reconstructed_center = self.decoder.predict(np.array([center_coord]))[0]
+        reconstructed_vertexes = self.decoder.predict(vertexes)
+        energy = 0
+        for decoded_vertex in reconstructed_vertexes:
+            diff = reconstructed_center - decoded_vertex
+            enegry_diff = np.mean(np.absolute(diff))
+            energy += enegry_diff
+        energy = energy / len(vertexes)
+        self._add_to_summary('manifold_volume', volume)
+        self._add_to_summary('manifold_energy', energy)
 
     def _energy_of_sequence(self, pic_sequence):
         if len(pic_sequence) < 2:
@@ -261,6 +288,9 @@ class ReportOnPath:
                                 topMargin=72, bottomMargin=18)
         doc.build(self.story)
         return self.summary
+
+
+
 
 ##################################################################################
 if __name__ == "__main__":
