@@ -75,6 +75,7 @@ class ReportOnPath:
         self.code_visualise()
         self.analise_encoder_params()
         self.analise_decoder_params()
+        self.potential_energy_of_input_sequence()
 
     def report_loss_decrease(self):
         # График сходимости
@@ -169,6 +170,14 @@ class ReportOnPath:
         self._add_img_to_report(filename)
         self._add_to_summary('kinetik energy of input', overall_energy)
         self._add_text_to_report('kinetik energy of input = ' + str(overall_energy))
+
+    def potential_energy_of_input_sequence(self):
+        diffs = [np.max(x) - np.min(x) for x in self.dataset]
+        means = [np.mean(x) for x in self.dataset]
+        mean_per_seq = np.array(diffs).mean()
+        overall_energy = np.array(diffs).mean()
+        self._add_to_summary('mean_poten_eneggy', overall_energy )
+        self._add_to_summary('mean', mean_per_seq)
 
     def code_visualise(self):
         encoded_imgs = self.encoder.predict(self.dataset)
