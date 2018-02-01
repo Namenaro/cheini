@@ -28,11 +28,11 @@ from reportlab.lib.units import cm
 
 class Serial:
     def __init__(self, dataset):
-        self.code_len = [2, 3]
+        self.code_len = [2]
         self.a_koef_reg = [0.001]
-        self.num_epochs = [100]
-        self.drop_in_decoder = [0.1]
-        self.drop_in_encoder = [0.1]
+        self.num_epochs = [20]
+        self.drop_in_decoder = [0.2]
+        self.drop_in_encoder = [0.2]
         self.activation = ['sigmoid']
         self.dataset = dataset
 
@@ -134,16 +134,13 @@ def make_seria_on_dataset(dataset, name_of_seria=None):
     print("summaries is saved into: " + os.getcwd())
     os.chdir(old_dir)
 
+def get_dataset(a_dir):
+    return [os.path.join(a_dir, name, 'foveas.pkl') for name in os.listdir(a_dir)
+            if os.path.isdir(os.path.join(a_dir, name))]
+
+
 if __name__ == "__main__":
-    dataset = ['C:\\5x5\\po conturu\\foveas.pkl',
-               'C:\\5x5\\po_conturu2\\foveas.pkl',
-               'C:\\5x5\\po_conturu3\\foveas.pkl',
-               'C:\\5x5\\slow_zifzag\\foveas.pkl']
+    directory = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\big dataset'
+    dataset = get_dataset(directory)
+    make_seria_on_dataset(dataset, "big foveal diverse dataset")
 
-    make_seria_on_dataset(dataset, "test oximiron")
-
-    dataset = ['C:\\5x5\\const_gray\\foveas.pkl',
-               'C:\\5x5\\const_struct\\foveas.pkl',
-               'C:\\5x5\\const_noise\\foveas.pkl']
-
-    make_seria_on_dataset(dataset, "test gnoiny")
