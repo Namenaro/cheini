@@ -62,6 +62,7 @@ def make_seq(name_seq):
     utils.setup_folder_for_results(name)
     utils.save_object(coordinateStore1.points, 'points')
     utils.save_object(coordinateStore1.foveas, 'foveas')
+    utils.save_object(path, 'name_of_image')
     for i in range(len(coordinateStore1.points)):
         utils.save_img_scaled(str(i),coordinateStore1.foveas[i], scaling_factor=5)
     restored_points = utils.open_file('points.pkl')
@@ -79,8 +80,9 @@ def make_seq(name_seq):
         plt.imshow(foveas01[i], cmap='gray', vmax=1.0, vmin=0.0)
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
-
+    plt.savefig(name + "_.png")
     plt.show()
+
 
 num = 0
 folder_full_path = os.getcwd()
