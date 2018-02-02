@@ -174,10 +174,10 @@ class ReportOnPath:
     def potential_energy_of_input_sequence(self):
         diffs = [np.max(x) - np.min(x) for x in self.dataset]
         means = [np.mean(x) for x in self.dataset]
-        mean_per_seq = np.array(diffs).mean()
+        mean_per_seq = np.array(means).mean()
         overall_energy = np.array(diffs).mean()
-        self._add_to_summary('mean_poten_eneggy', overall_energy )
-        self._add_to_summary('mean', mean_per_seq)
+        self._add_to_summary('mean_diff_input', overall_energy )
+        self._add_to_summary('mean_color_input', mean_per_seq)
 
     def code_visualise(self):
         encoded_imgs = self.encoder.predict(self.dataset)
@@ -197,7 +197,8 @@ class ReportOnPath:
 
     def estimate_energy_on_manifold(self, codes):
         bounds_arr = []
-        volume = 1
+        volume = 1.
+        perimeter = 0.
         code_dimensionality = codes.shape[1]
         center_coord = [None] * code_dimensionality
         for i in range(code_dimensionality):
@@ -207,6 +208,7 @@ class ReportOnPath:
             len_i = right_bound - left_bound
             center_coord[i] = left_bound + 0.5 * len_i
             volume *= len_i
+            perimeter += len_i
 
         vertexes = list(itertools.product(*bounds_arr))
         print(str(vertexes))
@@ -220,6 +222,7 @@ class ReportOnPath:
         energy = energy / len(vertexes)
         self._add_to_summary('manifold_volume', volume)
         self._add_to_summary('manifold_energy', energy)
+        self._add_to_summary('manifold_perimeter', perimeter)
 
     def _energy_of_sequence(self, pic_sequence):
         if len(pic_sequence) < 2:

@@ -62,8 +62,6 @@ def analize_summaries(summaries):
 
 def exper(summaries):
     df = pd.DataFrame(summaries)
-
-
     inpordant_columns = ['b_mean', 'kinetik energy of input', 'w_max', 'dataset']
     some_columns = df.loc[:, inpordant_columns]
     sns.pairplot(some_columns, hue='dataset')
@@ -72,11 +70,30 @@ def exper(summaries):
     champions = some_columns.sort_values(by='b_mean', ascending=False)
     print(champions)
 
-def exper2(summaries):
+
+def exper2(summaries): # док-во  независоимости b_mean от кинетической и потенциальной входа
     df = pd.DataFrame(summaries)
-    inpordant_columns = ['b_mean', 'w_max', 'num_epochs', 'dataset']
+    df['sum'] = df['kinetik energy of input'] + df['mean_poten_eneggy']
+    df['dif'] = df['kinetik energy of input'] - df['mean_poten_eneggy']
+    df['mul'] = df['kinetik energy of input'] * df['mean_poten_eneggy']
+    df['div'] = df['kinetik energy of input'] / df['mean_poten_eneggy']
+    #df['kinetik energy of input'] = df['kinetik energy of input'].apply(lambda x: round(x, ndigits=1))
+    inpordant_columns = ['b_mean', 'mean_poten_eneggy', 'kinetik energy of input', 'sum','dif', 'mul', 'div']
     some_columns = df.loc[:, inpordant_columns]
-    sns.pairplot(some_columns, hue='num')
+    ndf = some_columns.loc[df['num_epochs'] == 5000]
+    corr_mat = ndf.corr()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(corr_mat, vmax=1.0, vmin=-1.0, square=True, ax=ax, cmap='bwr')
+    plt.show()
+
+def exper3(summaries): # от чего зависит объем манифолда?
+    df = pd.DataFrame(summaries)
+    inpordant_columns = ['b_mean', 'mean_poten_eneggy', 'kinetik energy of input', 'manifold_volume', 'loss_decrease_ratio' ]
+    some_columns = df.loc[:, inpordant_columns]
+    ndf = some_columns.loc[df['num_epochs'] == 5000]
+    corr_mat = ndf.corr()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(corr_mat, vmax=1.0, vmin=-1.0, square=True, ax=ax, cmap='bwr')
     plt.show()
 
 
@@ -85,9 +102,9 @@ def print_statistics(df):
     print(df.describe())
 
 if __name__ == "__main__":
-    path2 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\biggest seria 108 exp\\summaries_dicts.pkl'
+    path2 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\ITOG RAPORY VCHERA many iterations\\summaries_dicts.pkl'
     path1 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\108 experiments 3 neuron\\summaries_dicts.pkl'
     summaries2 = utils.open_file(path2)
-    summaries1 = utils.open_file(path1)
-    summaries = summaries1 + summaries2
-    exper2(summaries)
+    #summaries1 = utils.open_file(path1)
+    #summaries = summaries1 + summaries2
+    exper3(summaries2)

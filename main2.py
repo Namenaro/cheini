@@ -27,14 +27,15 @@ from reportlab.lib.units import cm
 #one_experiment_report.main()
 
 class Serial:
-    def __init__(self, dataset):
+    def __init__(self, dataset, dataset_name='default'):
         self.code_len = [2]
         self.a_koef_reg = [0.001]
-        self.num_epochs = [20]
+        self.num_epochs = [1400, 5000]
         self.drop_in_decoder = [0.2]
         self.drop_in_encoder = [0.2]
         self.activation = ['sigmoid']
         self.dataset = dataset
+        self.dataset_name = dataset_name
 
     def _get_all_cominations(self):
         """
@@ -142,5 +143,5 @@ def get_dataset(a_dir):
 if __name__ == "__main__":
     directory = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\big dataset'
     dataset = get_dataset(directory)
-    make_seria_on_dataset(dataset, "big foveal diverse dataset")
+    make_seria_on_dataset(dataset, "ITOG RAPORY VCHERA many iterations")
 
