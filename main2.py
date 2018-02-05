@@ -29,13 +29,13 @@ from reportlab.lib.units import cm
 class Serial:
     def __init__(self, dataset, dataset_name='default'):
         self.code_len = [2]
-        self.a_koef_reg = [0.001]
-        self.num_epochs = [1400, 5000]
+        self.a_koef_reg = [0.01]
+        self.num_epochs = [3000]
         self.drop_in_decoder = [0.2]
         self.drop_in_encoder = [0.2]
         self.activation = ['sigmoid']
         self.dataset = dataset
-        self.dataset_name = dataset_name
+        self.dataset_name = [dataset_name]
 
     def _get_all_cominations(self):
         """
@@ -112,8 +112,9 @@ class Experiment:
         early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
         history = ae.fit(foveas01, foveas01,
                          epochs=self.num_epochs,
-                         batch_size=ceil(len(foveas01) / 2),
-                         shuffle=True,
+                         #batch_size=ceil(len(foveas01) / 2),
+                         batch_size=len(foveas01),
+                         shuffle=False,
                          validation_data=(foveas01, foveas01),
                          callbacks=[early_stopping])
 
@@ -142,6 +143,7 @@ def get_dataset(a_dir):
 
 if __name__ == "__main__":
     directory = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\big dataset'
-    dataset = get_dataset(directory)
-    make_seria_on_dataset(dataset, "ITOG RAPORY VCHERA many iterations")
+    der = 'C:\\5x5\\part_vs_all'
+    dataset = get_dataset(der)
+    make_seria_on_dataset(dataset, "ITOG part VS all 5000 no batches!")
 

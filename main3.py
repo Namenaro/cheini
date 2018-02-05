@@ -62,7 +62,17 @@ def analize_summaries(summaries):
 
 def exper(summaries):
     df = pd.DataFrame(summaries)
-    inpordant_columns = ['b_mean', 'kinetik energy of input', 'w_max', 'dataset']
+    inpordant_columns = ['b_mean',
+                         'w_mean'
+                         'kinetik energy of input',
+                         'manifold_volume',
+                         'loss_decrease_ratio',
+                         'code_max_to_min',
+                         'w_max',
+                         'dataset',
+                         'code_max',
+                         'manifold_energy',
+                         'manifold_perimeter']
     some_columns = df.loc[:, inpordant_columns]
     sns.pairplot(some_columns, hue='dataset')
     plt.show()
@@ -107,4 +117,4 @@ if __name__ == "__main__":
     summaries2 = utils.open_file(path2)
     #summaries1 = utils.open_file(path1)
     #summaries = summaries1 + summaries2
-    exper3(summaries2)
+    exper(summaries2)
