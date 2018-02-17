@@ -55,6 +55,15 @@ class DatasetMaker:
             utils.save_img_scaled(str(i), foveas[i], scaling_factor=5)
         self.visualise_saccade(foveas)
 
+    def get_area_of_saccada(self, points, img_copy, margin):
+        xs = np.array(points)[:, 0]
+        ys = np.array(points)[:, 1]
+        x_min = min(xs) - margin
+        x_max = max(xs)
+        y_min = min(ys) - margin
+        y_max = max(ys)
+        return img_copy[y_min:y_max, x_min:x_max]
+
 
     def visualise_saccade(self, foveas):
         if self.show_saccada_to_user is False:
@@ -95,6 +104,8 @@ class DatasetMaker:
             os.chdir(folder_sub_seria)
             utils.setup_folder_for_results(saccade_name)
             self.make_foveas_seq(points=coordinateStore.points, img=img, hside=hside)
+            area_saccada = self.get_area_of_saccada(points=coordinateStore.points, img_copy=img_copy, margin=hside*3)
+            utils.save_img_scaled("area", area_saccada, scaling_factor=3)
 
 
     def main_cycle(self):
@@ -109,6 +120,6 @@ class DatasetMaker:
             os.chdir(self.root_folder)  # обратно в папку серии
 
 
-utils.setup_folder_for_results(os.path.join(os.getcwd(),"results"))
+utils.setup_folder_for_results(os.path.join(os.getcwd(),"results2"))
 dataset_maker = DatasetMaker()
 dataset_maker.main_cycle()
