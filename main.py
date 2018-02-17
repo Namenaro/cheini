@@ -11,82 +11,104 @@ import os
 events = [i for i in dir(cv2) if 'EVENT' in i]
 print (events)
 
-HSIDE = 2
+
+def get_fovea(image, x, y, hside):
+    X1 = x - hside
+    X2 = x + hside + 1
+    Y1 = y - hside
+    Y2 = y + hside + 1
+    return image[Y1:Y2, X1:X2]
 
 
+class CoordinateStore:
+    def __init__(self, img_copy):
+        self.points = []
+        self.img_copy = img_copy
 
-def make_seq(name_seq):
-    path = easygui.fileopenbox(msg='выбрать картинку', filetypes=[["*.png", "*.jpg","*.jpeg", 'картинки']])
-    if path is None:
-        return
-    print("selected" + path)
-    name = str(name_seq) #utils.ask_user_for_name()
-    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)  # not draw on it!!!
-    img_copy = copy.deepcopy(img)  # draw on it
-    img_copy = cv2.cvtColor(img_copy, cv2.COLOR_GRAY2RGB)
-    cv2.imshow(name, img_copy)
-
-    def get_fovea(image, x, y, hside):
-        X1 = x - hside
-        X2 = x + hside + 1
-        Y1 = y - hside
-        Y2 = y + hside + 1
-        return image[Y1:Y2 ,X1:X2 ]
-
-    class CoordinateStore:
-        def __init__(self):
-            self.points = []
-            self.foveas = []
-
-        def select_point(self,event, x, y, flags, param):
-                if event == cv2.EVENT_LBUTTONDBLCLK:
-                    cv2.circle(img_copy,(x,y), 0,(255,0,0),-1)
-                    self.points.append((x,y))
-                    print('x=' + str(x)+' y=' + str(y))
-                    fovea_img = get_fovea(image=img, x=x, y=y, hside=HSIDE)
-                    self.foveas.append(fovea_img)
-                    cv2.imshow(name + 'fovea', fovea_img)
+    def select_point(self, event, x, y, flags, param):
+        if event == cv2.EVENT_LBUTTONDBLCLK:
+            cv2.circle(self.img_copy, (x, y), 0, (255, 0, 0), -1)
+            self.points.append((x, y))
+            print('x=' + str(x) + ' y=' + str(y))
 
 
-    coordinateStore1 = CoordinateStore()
-    cv2.setMouseCallback(name, coordinateStore1.select_point)
+class DatasetMaker:
+    def __init__(self):
+        self.hsides = [2, 3]
+        self.folders = []
+        for side in self.hsides:
+            folder_name = str(side*2+1) +"x" + str(side*2+1)
+            self.folders.append(folder_name)
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+        self.root_folder = os.getcwd()
+        self.show_saccada_to_user = True
 
-    while(1):
-        cv2.imshow(name, img_copy)
-        k = cv2.waitKey(20) & 0xFF
-        if k == 27:
-            break
-    cv2.destroyAllWindows()
-
-    # сохранение результатов:
-    utils.setup_folder_for_results(name)
-    utils.save_object(coordinateStore1.points, 'points')
-    utils.save_object(coordinateStore1.foveas, 'foveas')
-    utils.save_object(path, 'name_of_image')
-    for i in range(len(coordinateStore1.points)):
-        utils.save_img_scaled(str(i),coordinateStore1.foveas[i], scaling_factor=5)
-    restored_points = utils.open_file('points.pkl')
-    print("points: " + str(restored_points))
-
-    # visualise foveas
-    foveas01 = utils.scale_dataset_to01(coordinateStore1.foveas)
-    foveas01 = np.array(foveas01)
-    n = len(foveas01)
-    plt.figure(figsize=(10, 2))
-    for i in range(n):
-        # display original
-        ax = plt.subplot(2, n, i + 1)
-        ax.set_title( "original " + str(i))
-        plt.imshow(foveas01[i], cmap='gray', vmax=1.0, vmin=0.0)
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
-    plt.savefig(name + "_.png")
-    plt.show()
+    def make_foveas_seq(self, points, img, hside):
+        foveas = []
+        for point in points:
+            fovea_img = get_fovea(image=img, x=point[0], y=point[1], hside=hside)
+            foveas.append(fovea_img)
+        utils.save_object(points, 'points')
+        utils.save_object(foveas, 'foveas')
+        for i in range(len(points)):
+            utils.save_img_scaled(str(i), foveas[i], scaling_factor=5)
+        self.visualise_saccade(foveas)
 
 
-num = 0
-folder_full_path = os.getcwd()
-while(1):
-    make_seq(num)
-    num += 1
-    os.chdir(folder_full_path)  # обратно в папку серии
+    def visualise_saccade(self, foveas):
+        if self.show_saccada_to_user is False:
+            return
+        foveas01 = utils.scale_dataset_to01(foveas)
+        foveas01 = np.array(foveas01)
+        n = len(foveas01)
+        plt.figure(figsize=(10, 2))
+        for i in range(n):
+            # display original
+            ax = plt.subplot(2, n, i + 1)
+            ax.set_title("original " + str(i))
+            plt.imshow(foveas01[i], cmap='gray', vmax=1.0, vmin=0.0)
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        plt.savefig("saccada.png")
+        plt.show()
+
+    def make_saccada(self, saccade_name, path_to_pic):
+        img = cv2.imread(path_to_pic, cv2.IMREAD_GRAYSCALE)  # not draw on it!!!
+        img_copy = copy.deepcopy(img)  # draw on it
+        img_copy = cv2.cvtColor(img_copy, cv2.COLOR_GRAY2RGB)
+        cv2.imshow('picture', img_copy)
+        coordinateStore = CoordinateStore(img_copy=img_copy)
+        cv2.setMouseCallback('picture', coordinateStore.select_point)
+
+        while(1):
+            cv2.imshow('picture', img_copy)
+            k = cv2.waitKey(20) & 0xFF
+            if k == 27:
+                break
+        cv2.destroyAllWindows()
+
+        # сохранение результатов:
+        for k in range(len(self.hsides)):
+            hside = self.hsides[k]
+            folder_sub_seria = os.path.join(self.root_folder, self.folders[k])
+            os.chdir(folder_sub_seria)
+            utils.setup_folder_for_results(saccade_name)
+            self.make_foveas_seq(points=coordinateStore.points, img=img, hside=hside)
+
+
+    def main_cycle(self):
+        num = 0
+        while (1):
+            path_to_pic = easygui.fileopenbox(msg='выбрать картинку', filetypes=[["*.png", "*.jpg", "*.jpeg", 'картинки']])
+            if path_to_pic is None:
+                return
+            saccade_name = str(num)  # utils.ask_user_for_name()
+            self.make_saccada(saccade_name=saccade_name, path_to_pic=path_to_pic)
+            num += 1
+            os.chdir(self.root_folder)  # обратно в папку серии
+
+
+utils.setup_folder_for_results(os.path.join(os.getcwd(),"results"))
+dataset_maker = DatasetMaker()
+dataset_maker.main_cycle()

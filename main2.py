@@ -28,10 +28,10 @@ from reportlab.lib.units import cm
 
 class Serial:
     def __init__(self, dataset, dataset_name='default'):
-        self.batch_size = [3]
+        self.batch_size = [2]
         self.code_len = [3]
         self.wb_koef_reg = [0.]
-        self.num_epochs = [20]
+        self.num_epochs = [2200]
         self.drop_in_decoder = [0.0]
         self.drop_in_encoder = [0.0]
         self.activation = ['linear']
@@ -174,7 +174,7 @@ def get_dataset(a_dir):
 
 
 if __name__ == "__main__":
-    directory = 'C:\\5x5\\test'
+    directory = 'C:\\5x5\\part_vs_all'
     dataset = get_dataset(directory)
-    make_seria_on_dataset(dataset, "ITOG test 1")
+    make_seria_on_dataset(dataset, "ITOG 5x5")
 
