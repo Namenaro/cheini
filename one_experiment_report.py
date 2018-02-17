@@ -6,6 +6,7 @@ from math import floor, ceil
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
+import os
 
 from keras.callbacks import EarlyStopping
 from keras.callbacks import TensorBoard
@@ -57,17 +58,20 @@ def main():
     utils.save_all(encoder=en, decoder=de, autoencoder=ae)
 
 class ReportOnPath:
-    def __init__(self, ae, en, de, history_obj, dataset, SHOW=False):
+    def __init__(self, ae, en, de, history_obj, dataset, name_of_experiment, SHOW=False):
         self.autoencoder = ae
         self.history_obj = history_obj
         self.encoder = en
         self.decoder = de
         self.dataset = dataset
         self.story = []
+        self.outer_story = []
         self.summary = {}
         self.SHOW = SHOW
+        self.name_of_experiment = name_of_experiment
 
     def create_summary(self):
+        self._add_text_to_report("--------" + self.name_of_experiment, outer=True)
         self.report_loss_decrease()
         self.visualise_reconstruction()
         self.visualise_manifold_2d(i=0, j=1)
@@ -116,7 +120,7 @@ class ReportOnPath:
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
         self._savefig("reconstruction.png")
-        self._add_img_to_report("reconstruction.png")
+        self._add_img_to_report("reconstruction.png", outer=True)
 
     def visualise_manifold_2d(self, i, j):
         self._add_text_to_report("visualise manifold by " + str(i) + ", " + str(j))
@@ -131,7 +135,7 @@ class ReportOnPath:
         plt.colorbar()
         filename=str(i) + "_" + str(j) +"_manifold(as points).png"
         self._savefig(filename)
-        self._add_img_to_report(filename)
+        self._add_img_to_report(filename, outer=True)
 
         # Визуализировать многообразие: картинками, пробегая по решетке кодов 2д
         grid_n = 15
@@ -154,7 +158,7 @@ class ReportOnPath:
         plt.imshow(figure, cmap='gray', vmax=1.0, vmin=0.0)
         filename2 = str(i) + "_" + str(j) + "_manifold(as pictures).png"
         self._savefig(filename2)
-        self._add_text_to_report(filename2)
+        self._add_img_to_report(filename2, outer=True)
 
     def kinetik_energy_of_input_sequence(self):
         energies = self._energy_of_sequence(self.dataset)
@@ -256,7 +260,7 @@ class ReportOnPath:
         cax = ax1.matshow(weights, vmin=-abs_max, vmax=abs_max, cmap='bwr')
         cax = ax2.matshow([biases], vmin=-abs_max, vmax=abs_max, cmap='bwr')
         fig.colorbar(cax)
-        filename = "FIRST (encoder) layer.png"
+        filename = layer_name + ".png"
         self._savefig(filename)
         self._add_img_to_report(filename)
 
@@ -275,9 +279,13 @@ class ReportOnPath:
         self._add_to_summary('wb_ratio_mean', mean_w/mean_b)
         self._add_to_summary('b_mean', mean_b)
 
-    def _add_img_to_report(self, img_name):
-        im = utils.get_image_for_report(img_name, width=8*cm)
+    def _add_img_to_report(self, img_name, outer=False):
+        full_img_name = os.path.join(os.getcwd(), img_name)
+        im = utils.get_image_for_report(full_img_name, width=8*cm)
         self.story.append(im)
+        if outer:
+            im = utils.get_image_for_report(full_img_name, width=8 * cm)
+            self.outer_story.append(im)
 
     def _savefig(self, filename):
         if self.SHOW:
@@ -285,10 +293,12 @@ class ReportOnPath:
         plt.savefig(filename)
         plt.close()
 
-    def _add_text_to_report(self, text):
+    def _add_text_to_report(self, text, outer=False):
         ptext = '<font size=12>%s</font>' % text
         styles = getSampleStyleSheet()
         self.story.append(Paragraph(ptext, styles["Normal"]))
+        if outer:
+            self.outer_story.append(Paragraph(ptext, styles["Normal"]))
 
     def _add_to_summary(self, key, val):
         self.summary[key] = val
@@ -299,7 +309,7 @@ class ReportOnPath:
                                 rightMargin=72, leftMargin=72,
                                 topMargin=72, bottomMargin=18)
         doc.build(self.story)
-        return self.summary
+        return self.summary, self.outer_story
 
 
 

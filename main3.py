@@ -62,22 +62,32 @@ def analize_summaries(summaries):
 
 def exper(summaries):
     df = pd.DataFrame(summaries)
-    inpordant_columns = ['b_mean',
-                         'w_mean'
-                         'kinetik energy of input',
+    columns = ['b_mean',
+                         'w_mean',
+                         'dataset',
                          'manifold_volume',
                          'loss_decrease_ratio',
                          'code_max_to_min',
                          'w_max',
-                         'dataset',
                          'code_max',
                          'manifold_energy',
-                         'manifold_perimeter']
-    some_columns = df.loc[:, inpordant_columns]
-    sns.pairplot(some_columns, hue='dataset')
-    plt.show()
+                         'manifold_perimeter'
 
-    champions = some_columns.sort_values(by='b_mean', ascending=False)
+                        ]
+    inpordant_columns = ['b_mean',
+                         'dataset',
+                         'manifold_energy',
+                         'manifold_perimeter'
+
+                         ]
+    some_columns = df.loc[:, inpordant_columns]
+
+    sns.pairplot(some_columns, hue='dataset', palette='YlGn')
+    plt.show()
+    sns.lmplot(x="manifold_volume", y="manifold_energy", hue="dataset", data=df)
+    plt.tight_layout()
+    plt.show()
+    champions = some_columns.sort_values(by='dataset', ascending=False)
     print(champions)
 
 
@@ -112,7 +122,7 @@ def print_statistics(df):
     print(df.describe())
 
 if __name__ == "__main__":
-    path2 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\ITOG RAPORY VCHERA many iterations\\summaries_dicts.pkl'
+    path2 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\ITOG elu i batch no reg absolutely\\summaries_dicts.pkl'
     path1 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\SERIES\\108 experiments 3 neuron\\summaries_dicts.pkl'
     summaries2 = utils.open_file(path2)
     #summaries1 = utils.open_file(path1)

@@ -147,3 +147,5 @@ def save_all(encoder, decoder, autoencoder):
     encoder.save('encoder.h5')
     decoder.save('decoder.h5')
     autoencoder.save('autoencoder.h5')
+
+
