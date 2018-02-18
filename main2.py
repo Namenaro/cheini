@@ -19,6 +19,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
+from keras import losses
 
 
 
@@ -28,8 +29,8 @@ from reportlab.lib.units import cm
 
 class Serial:
     def __init__(self, dataset, dataset_name='default'):
-        self.batch_size = [2]
-        self.code_len = [3]
+        self.batch_size = [3]
+        self.code_len = [2]
         self.wb_koef_reg = [0.]
         self.num_epochs = [2200]
         self.drop_in_decoder = [0.0]
@@ -103,9 +104,13 @@ class ActivityRegularizer(Regularizer):
 
     def __call__(self,x):
         loss = 0
-        loss += self.l1 * K.sum(K.mean(K.abs(x), axis=0))
-        loss += self.l2 * K.sum(K.mean(K.square(x), axis=0))
-        return loss
+        #loss += self.l1 * K.sum(K.mean(K.abs(x), axis=0))
+        #loss += self.l2 * K.sum(K.mean(K.square(x), axis=0))
+        p1 = x[0]
+        p2 = x[1]
+        p3 = x[2]
+        loss = 0
+        return 0
 
     def get_config(self):
         return {"name": self.__class__.__name__,
@@ -134,7 +139,7 @@ class Experiment:
                                                 drop_in_encoder=self.drop_in_encoder)
 
         sgd = optimizers.SGD(lr=0.02, decay=1e-6, momentum=0.9, nesterov=True)
-        ae.compile(optimizer=sgd, loss='mean_squared_error')
+        ae.compile(optimizer=sgd, loss=losses.mean_squared_error)
 
         early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto')
         history = ae.fit(foveas01, foveas01,
@@ -149,7 +154,7 @@ class Experiment:
         report = one_experiment_report.ReportOnPath(ae=ae, en=en, de=de,
                                                     dataset=foveas01,
                                                     history_obj=history,
-                                                    name_of_experiment=name_of_experiment
+                                                    name_of_experiment=self.dataset + "__" + name_of_experiment
                                                     )
         report.create_summary()
         summary, exp_outer_story = report.end()
@@ -172,9 +177,17 @@ def get_dataset(a_dir):
     return [os.path.join(a_dir, name, 'foveas.pkl') for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
+def learn_models_on_dataset(folder_with_dataset, name_for_experiment):
+    dataset = get_dataset(folder_with_dataset)
+    make_seria_on_dataset(dataset, name_for_experiment)
+
 
 if __name__ == "__main__":
-    directory = 'C:\\5x5\\part_vs_all'
-    dataset = get_dataset(directory)
-    make_seria_on_dataset(dataset, "ITOG 5x5")
+    directory = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\partial\\7x7'
+    learn_models_on_dataset(folder_with_dataset=directory,
+                            name_for_experiment='7x7 last ITOG')
+
+    #directory1 = 'C:\\Users\\neuro\\PycharmProjects\\cheini\\partial\\7x7'
+   # dataset1 = get_dataset(directory1)
+    #make_seria_on_dataset(dataset1, "ITOG 7x7 partial_")
 

@@ -34,7 +34,7 @@ class CoordinateStore:
 
 class DatasetMaker:
     def __init__(self):
-        self.hsides = [2, 3]
+        self.hsides = [2, 3, 4]
         self.folders = []
         for side in self.hsides:
             folder_name = str(side*2+1) +"x" + str(side*2+1)
@@ -42,7 +42,7 @@ class DatasetMaker:
             if not os.path.exists(folder_name):
                 os.makedirs(folder_name)
         self.root_folder = os.getcwd()
-        self.show_saccada_to_user = True
+        self.show_saccada_to_user = False
 
     def make_foveas_seq(self, points, img, hside):
         foveas = []
@@ -120,6 +120,6 @@ class DatasetMaker:
             os.chdir(self.root_folder)  # обратно в папку серии
 
 
-utils.setup_folder_for_results(os.path.join(os.getcwd(),"results2"))
+utils.setup_folder_for_results(os.path.join(os.getcwd(),"olaf"))
 dataset_maker = DatasetMaker()
 dataset_maker.main_cycle()
